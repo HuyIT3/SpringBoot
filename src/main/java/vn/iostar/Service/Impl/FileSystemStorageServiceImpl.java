@@ -1,4 +1,4 @@
-package vn.iostar.Service;
+package vn.iostar.Service.Impl;
 
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -7,22 +7,17 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.web.multipart.MultipartFile;
-
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import vn.iostar.Exception.StorageException;
 import vn.iostar.Config.StorageProperties;
+import vn.iostar.Exception.StorageException;
+import vn.iostar.Service.IStorageService;
 @Service
 public class FileSystemStorageServiceImpl implements IStorageService{
 	private final Path rootLocation;
-	public FileSystemStorageServiceImpl(StorageProperties properties) {
-		this.rootLocation = Paths.get(properties.getLocation());
-		
-		}
-	
 	@Override
 	public void init() {
 		try {
@@ -38,12 +33,13 @@ public class FileSystemStorageServiceImpl implements IStorageService{
 		Path destinationFile =
 				rootLocation.resolve(Paths.get(storeFilename)).normalize().toAbsolutePath();
 				Files.delete(destinationFile);
-
+		
 	}
 
 	@Override
 	public Path load(String filename) {
 		return rootLocation.resolve(filename);
+
 	}
 
 	@Override
@@ -58,6 +54,7 @@ public class FileSystemStorageServiceImpl implements IStorageService{
 			} catch (Exception e) {
 			throw new StorageException("Could not read file: " + filename);
 			}
+
 	}
 
 	@Override
@@ -68,7 +65,7 @@ public class FileSystemStorageServiceImpl implements IStorageService{
 			}
 			Path destinationFile =
 			this.rootLocation.resolve(Paths.get(storeFilename))
-			.normalize().toAbsolutePath(); 
+			.normalize().toAbsolutePath();
 			if(!destinationFile.getParent().equals(this.rootLocation.toAbsolutePath())) {
 			throw new StorageException("Cannot store file outside curent directory");
 			}
@@ -80,13 +77,15 @@ public class FileSystemStorageServiceImpl implements IStorageService{
 			throw new StorageException("Failed to store file: ", e);
 			}
 
-		
 	}
-
+	 public FileSystemStorageServiceImpl(StorageProperties properties) {
+	        this.rootLocation = Paths.get(properties.getLocation());
+	    }
 	@Override
 	public String getSorageFilename(MultipartFile file, String id) {
 		String ext = FilenameUtils.getExtension(file.getOriginalFilename());
 		return "p" + id + "." + ext;
+
 	}
 
 }

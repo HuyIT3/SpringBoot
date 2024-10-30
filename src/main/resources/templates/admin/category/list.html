@@ -34,7 +34,8 @@
         </tr>
         <tr th:each="cate, STT : ${categoryPage.content}">
             <td th:text="${STT.index + 1}"></td>
-            <td><img th:src="@{/uploads/{icon}(icon=${cate.icon})}" alt="Icon" width="50"></td>
+            <td><img th:src="@{'/uploads/' + ${cate.icon}}" alt="Icon" width="50"></td>
+
             <td th:text="${cate.categoryName}"></td>
             <td th:text="${cate.status}"></td>
             <td>

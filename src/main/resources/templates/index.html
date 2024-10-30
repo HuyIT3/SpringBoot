@@ -11,23 +11,56 @@
         .content {
             margin: 20px;
         }
+        .form-container {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            background-color: #ffffff;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"],
+        input[type="file"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
 <header>
-    <img src="/images/sv_ute.jpg" alt="Your Image" width="100">
+    <img src="/images/download.png" alt="Your Image" width="100">
     <h1>Category Management</h1>
 </header>
 
 <div class="content">
     <h2>Add Category</h2>
-    <form th:action="@{/admin/categories/addCategory}" method="post" enctype="multipart/form-data">
-        <label for="categoryName">Category Name:</label>
-        <input type="text" id="categoryName" name="categoryName" required>
-        <label for="icon">Icon:</label>
-        <input type="file" id="icon" name="icon" required>
-        <button type="submit">Add Category</button>
-    </form>
+    <div class="form-container">
+        <form th:action="@{/admin/categories/addCategory}" method="post" enctype="multipart/form-data">
+            <label for="categoryName">Category Name:</label>
+            <input type="text" id="categoryName" name="categoryName" placeholder="Enter category name" required>
+
+            <label for="icon">Icon:</label>
+            <input type="file" id="icon" name="icon" required>
+
+            <button type="submit">Add Category</button>
+        </form>
+    </div>
 
     <h2>Category List</h2>
     <table>
@@ -45,11 +78,11 @@
             <td th:text="${category.categoryName}">Category Name</td>
             <td><img th:src="@{/uploads/{icon}(icon=${category.icon})}" alt="Icon" width="50"></td>
             <td>
-                <form th:action="@{/admin/categories/deleteCategory}" method="post">
+                <form th:action="@{/admin/categories/deleteCategory}" method="post" style="display:inline;">
                     <input type="hidden" name="categoryId" th:value="${category.categoryId}">
                     <button type="submit">Delete</button>
                 </form>
-                <form th:action="@{/admin/categories/updateCategory}" method="post" enctype="multipart/form-data">
+                <form th:action="@{/admin/categories/updateCategory}" method="post" enctype="multipart/form-data" style="display:inline;">
                     <input type="hidden" name="_method" value="put">
                     <input type="hidden" name="categoryId" th:value="${category.categoryId}">
                     <button type="submit">Edit</button>

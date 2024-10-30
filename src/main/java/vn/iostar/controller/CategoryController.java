@@ -93,26 +93,30 @@ public class CategoryController {
     }
 
     @PostMapping(path = "/addCategory")
-    public ResponseEntity<?> addCategory(@Validated @RequestParam("categoryName") String categoryName,
-                                         @Validated @RequestParam("icon") MultipartFile icon) {
+    public String addCategory(@Validated @RequestParam("categoryName") String categoryName,
+                              @Validated @RequestParam("icon") MultipartFile icon,
+                              ModelMap model) {
         Optional<Category> optCategory = categoryService.findByCategoryName(categoryName);
 
         if (optCategory.isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category đã tồn tại trong hệ thống");
-        } else {
-            Category category = new Category();
-            if (!icon.isEmpty()) {
-                UUID uuid = UUID.randomUUID();
-                String uuString = uuid.toString();
-                category.setIcon(storageService.getSorageFilename(icon, uuString));
-                storageService.store(icon, category.getIcon());
-            }
-
-            category.setCategoryName(categoryName);
-            categoryService.save(category);
-            return new ResponseEntity<Response>(new Response(true, "Thêm Thành công", category), HttpStatus.OK);
+            model.addAttribute("message", "Category đã tồn tại trong hệ thống");
+            return "redirect:/admin/categories/home";
         }
+
+        Category category = new Category();
+        if (!icon.isEmpty()) {
+            UUID uuid = UUID.randomUUID();
+            String uuString = uuid.toString();
+            category.setIcon(storageService.getSorageFilename(icon, uuString));
+            storageService.store(icon, category.getIcon());
+        }
+
+        category.setCategoryName(categoryName);
+        categoryService.save(category);
+        model.addAttribute("message", "Thêm thành công");
+        return "redirect:/admin/categories/home";
     }
+
 
     @PutMapping(path = "/updateCategory")
     public String updateCategory(@Validated @RequestParam("categoryId") Long categoryId,

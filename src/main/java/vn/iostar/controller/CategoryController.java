@@ -118,41 +118,49 @@ public class CategoryController {
     }
 
 
-    @PutMapping(path = "/updateCategory")
-    public String updateCategory(@Validated @RequestParam("categoryId") Long categoryId,
-                                 @Validated @RequestParam("categoryName") String categoryName,
-                                 @Validated @RequestParam("icon") MultipartFile icon,
+    @PostMapping(path = "/updateCategory")
+    public String updateCategory(@RequestParam("categoryId") Long categoryId,
+                                 @RequestParam("categoryName") String categoryName,
+                                 @RequestParam(value = "icon", required = false) MultipartFile icon,
                                  ModelMap model) {
-        Optional<Category> optCategory = categoryService.findById(categoryId);
+        if (categoryName == null || categoryName.trim().isEmpty()) {
+            model.addAttribute("error", "Category name is required");
+            return "redirect:/admin/categories/edit?id=" + categoryId;
+        }
 
+        Optional<Category> optCategory = categoryService.findById(categoryId);
         if (optCategory.isEmpty()) {
             model.addAttribute("error", "Không tìm thấy Category");
-            return "error"; // Return an error page if category not found
+            return "redirect:/admin/categories/home"; // Redirect to home instead of error page
         }
 
         Category category = optCategory.get();
-        if (!icon.isEmpty()) {
+        category.setCategoryName(categoryName);
+        if (icon != null && !icon.isEmpty()) {
             UUID uuid = UUID.randomUUID();
             String uuString = uuid.toString();
             category.setIcon(storageService.getSorageFilename(icon, uuString));
             storageService.store(icon, category.getIcon());
         }
 
-        category.setCategoryName(categoryName);
         categoryService.save(category);
-
-        model.addAttribute("categories", category);
-        return "category_edit"; // Return the category_edit.html template
+        model.addAttribute("message", "Cập nhật thành công");
+        return "redirect:/admin/categories/home";
     }
 
-    @DeleteMapping(path = "/deleteCategory")
-    public ResponseEntity<?> deleteCategory(@Validated @RequestParam("categoryId") Long categoryId) {
+
+
+    @PostMapping(path = "/deleteCategory")
+    public String deleteCategory(@RequestParam("categoryId") Long categoryId, ModelMap model) {
         Optional<Category> optCategory = categoryService.findById(categoryId);
         if (optCategory.isEmpty()) {
-            return new ResponseEntity<>(new Response(false, "Không tìm thấy Category", null), HttpStatus.BAD_REQUEST);
+            model.addAttribute("error", "Không tìm thấy Category");
+            return "redirect:/admin/categories/home";
         }
 
         categoryService.delete(optCategory.get());
-        return new ResponseEntity<>(new Response(true, "Xóa Thành công", optCategory.get()), HttpStatus.OK);
+        model.addAttribute("message", "Xóa thành công");
+        return "redirect:/admin/categories/home";
     }
+
 }

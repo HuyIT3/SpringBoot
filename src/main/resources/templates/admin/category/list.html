@@ -8,11 +8,11 @@
 
 <a th:href="@{/admin/categories/add}">Add category</a>
 
-<!-- Hiển thông báo -->
+<!-- Hiển thị thông báo -->
 <div th:if="${message != null}">
     <i th:text="${message}"></i>
 </div>
-<!-- Hêt thông báo -->
+<!-- Hết thông báo -->
 
 <form th:action="@{/admin/categories/searchpaginated}" method="get">
     <input type="text" name="name" id="name" placeholder="Nhập từ khóa để tìm" />
@@ -35,12 +35,14 @@
         <tr th:each="cate, STT : ${categoryPage.content}">
             <td th:text="${STT.index + 1}"></td>
             <td><img th:src="@{'/uploads/' + ${cate.icon}}" alt="Icon" width="50"></td>
-
             <td th:text="${cate.categoryName}"></td>
             <td th:text="${cate.status}"></td>
             <td>
                 <a th:href="@{/admin/categories/edit/{id}(id=${cate.categoryId})}">Sửa</a>
-                <a th:href="@{/admin/categories/delete/{id}(id=${cate.categoryId})}">Xóa</a>
+                <form th:action="@{/admin/categories/deleteCategory}" method="post" style="display:inline;">
+                    <input type="hidden" name="categoryId" th:value="${cate.categoryId}" />
+                    <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa?');">Xóa</button>
+                </form>
             </td>
         </tr>
     </table>
